@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Day ✨ — Tu organizadora personal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- BACKGROUND BLOBS -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+  <div class="bg-blob blob-4"></div>
+
+  <!-- CONFETTI CANVAS -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <div class="app">
+
+    <!-- ── HEADER ── -->
+    <header>
+      <div class="header-date" id="date-label">hoy</div>
+      <h1>My <em>Day</em> ✨</h1>
+      <p class="header-sub">Tu espacio para brillar cada día</p>
+    </header>
+
+    <!-- ── QUOTE CARD ── -->
+    <div class="quote-card" id="quote-card" title="Clic para nueva frase">
+      <div class="quote-icon" id="quote-icon">🌸</div>
+      <div>
+        <div class="quote-text" id="quote-text"></div>
+        <div class="quote-hint">Toca para cambiar la frase 💫</div>
+      </div>
+    </div>
+
+    <!-- ── PROGRESS ── -->
+    <div class="progress-section">
+      <div class="section-label">🌿 Progreso de hoy</div>
+      <div class="progress-meta"><span id="progress-pct">0%</span> completado</div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-stats">
+        <div class="stat">
+          <span class="stat-num" id="stat-done">0</span>
+          <span class="stat-label">Hechas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-pending">0</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TABS ── -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="hoy">🌸 Hoy</button>
+      <button class="tab-btn" data-tab="semana">📅 Semana</button>
+      <button class="tab-btn" data-tab="habitos">🌿 Hábitos</button>
+    </div>
+
+    <!-- ── PANEL HOY ── -->
+    <div id="panel-hoy">
+
+      <!-- ADD TASK FORM -->
+      <div class="add-task-form">
+        <div class="task-input-wrap">
+          <span class="input-icon">✏️</span>
+          <input
+            id="task-input"
+            class="task-input"
+            type="text"
+            placeholder="Agrega algo a tu día..."
+            autocomplete="off"
+          />
+        </div>
+        <select id="cat-select" class="category-select">
+          <option value="personal">💆 Personal</option>
+          <option value="trabajo">💼 Trabajo</option>
+          <option value="salud">🌿 Salud</option>
+          <option value="hogar">🏡 Hogar</option>
+          <option value="social">🤍 Social</option>
+        </select>
+        <button id="add-btn" class="add-btn">+</button>
+      </div>
+
+      <!-- CATEGORY FILTERS -->
+      <div class="category-filters" id="cat-filters"></div>
+
+      <!-- TASK LIST -->
+      <div class="task-list" id="task-list"></div>
+
+    </div>
+
+    <!-- ── PANEL SEMANA ── -->
+    <div id="panel-semana" style="display:none;">
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+
+    <!-- ── PANEL HÁBITOS ── -->
+    <div id="panel-habitos" style="display:none;">
+      <div class="habits-grid" id="habits-wrap"></div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

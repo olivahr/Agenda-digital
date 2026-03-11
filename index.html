@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0F0D0E">
+  <title>Bloom ✿ Agenda</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E✿%3C/text%3E%3C/svg%3E">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash" class="splash-screen">
+    <div class="splash-content">
+      <div class="splash-logo">✿</div>
+      <div class="splash-title">Bloom</div>
+      <div class="splash-subtitle">Tu agenda personal</div>
+    </div>
+  </div>
+
+  <!-- App Container -->
+  <div id="app" class="app-container hidden">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+      <div class="header-title">
+        <span id="current-view-title">Hoy</span>
+        <span id="current-date" class="header-date"></span>
+      </div>
+      <button class="add-btn" onclick="showAddModal()">+</button>
+    </header>
+
+    <!-- Navigation Menu -->
+    <nav id="side-menu" class="side-menu">
+      <div class="menu-header">
+        <div class="user-avatar">✿</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name">Mi Agenda</div>
+          <div class="user-status">✨ Organizada</div>
+        </div>
+      </div>
+      
+      <div class="menu-section">
+        <div class="menu-label">Vistas</div>
+        <button class="menu-item active" onclick="switchView('today')" data-view="today">
+          <span class="menu-icon">☀️</span>
+          <span>Hoy</span>
+          <span class="badge" id="badge-today">0</span>
+        </button>
+        <button class="menu-item" onclick="switchView('calendar')" data-view="calendar">
+          <span class="menu-icon">📅</span>
+          <span>Calendario</span>
+        </button>
+        <button class="menu-item" onclick="switchView('week')" data-view="week">
+          <span class="menu-icon">📊</span>
+          <span>Esta Semana</span>
+        </button>
+      </div>
+
+      <div class="menu-section">
+        <div class="menu-label">Organización</div>
+        <button class="menu-item" onclick="switchView('tasks')" data-view="tasks">
+          <span class="menu-icon">✓</span>
+          <span>Tareas</span>
+          <span class="badge" id="badge-tasks">0</span>
+        </button>
+        <button class="menu-item" onclick="switchView('habits')" data-view="habits">
+          <span class="menu-icon">🔥</span>
+          <span>Hábitos</span>
+        </button>
+        <button class="menu-item" onclick="switchView('notes')" data-view="notes">
+          <span class="menu-icon">📝</span>
+          <span>Notas</span>
+        </button>
+      </div>
+
+      <div class="menu-section">
+        <div class="menu-label">Bienestar</div>
+        <button class="menu-item" onclick="switchView('mood')" data-view="mood">
+          <span class="menu-icon">💭</span>
+          <span>Estado de Ánimo</span>
+        </button>
+        <button class="menu-item" onclick="switchView('focus')" data-view="focus">
+          <span class="menu-icon">🎯</span>
+          <span>Modo Foco</span>
+        </button>
+      </div>
+
+      <div class="menu-footer">
+        <button class="menu-item" onclick="exportData()">
+          <span class="menu-icon">💾</span>
+          <span>Guardar Backup</span>
+        </button>
+        <button class="menu-item" onclick="document.getElementById('import-file').click()">
+          <span class="menu-icon">📥</span>
+          <span>Cargar Backup</span>
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+      </div>
+    </nav>
+
+    <!-- Overlay -->
+    <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- VIEW: TODAY -->
+      <section id="view-today" class="view active">
+        <div class="welcome-card">
+          <div class="welcome-greeting" id="greeting">Buenos días</div>
+          <div class="welcome-name">✨ Hoy es un día especial</div>
+          <div class="welcome-quote" id="daily-quote">"Cada día es una nueva oportunidad"</div>
+        </div>
+
+        <div class="progress-ring-container">
+          <div class="progress-ring">
+            <svg viewBox="0 0 120 120">
+              <circle class="progress-ring-bg" cx="60" cy="60" r="54"/>
+              <circle class="progress-ring-fill" id="today-progress" cx="60" cy="60" r="54"/>
+            </svg>
+            <div class="progress-text">
+              <span class="progress-percent" id="today-percent">0%</span>
+              <span class="progress-label">completado</span>
+            </div>
+          </div>
+          <div class="progress-stats">
+            <div class="stat">
+              <span class="stat-value" id="today-done">0</span>
+              <span class="stat-label">Hechas</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" id="today-total">0</span>
+              <span class="stat-label">Total</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <h2>Tareas de Hoy</h2>
+          <button class="text-btn" onclick="showAddModal()">+ Agregar</button>
+        </div>
+        <div id="today-tasks-list" class="tasks-list"></div>
+
+        <div class="quick-actions">
+          <button class="quick-btn" onclick="showAddModal('habit')">
+            <span>🔥</span>
+            <span>Hábito</span>
+          </button>
+          <button class="quick-btn" onclick="showAddModal('note')">
+            <span>📝</span>
+            <span>Nota</span>
+          </button>
+          <button class="quick-btn" onclick="switchView('focus')">
+            <span>🎯</span>
+            <span>Foco</span>
+          </button>
+          <button class="quick-btn" onclick="logMood()">
+            <span>💭</span>
+            <span>Ánimo</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- VIEW: CALENDAR -->
+      <section id="view-calendar" class="view">
+        <div class="calendar-header">
+          <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
+          <div class="calendar-title" id="calendar-month">Marzo 2026</div>
+          <button class="nav-arrow" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span>
+          <span>Jue</span><span>Vie</span><span>Sáb</span>
+        </div>
+        <div id="calendar-grid" class="calendar-grid"></div>
+        
+        <div class="selected-day-info" id="selected-day-info">
+          <div class="day-info-header">
+            <span id="selected-date-label">Selecciona un día</span>
+            <button class="text-btn" onclick="showAddModalForSelectedDay()">+ Agregar</button>
+          </div>
+          <div id="selected-day-tasks" class="day-tasks-list"></div>
+        </div>
+      </section>
+
+      <!-- VIEW: WEEK -->
+      <section id="view-week" class="view">
+        <div class="week-header">
+          <h2>Esta Semana</h2>
+          <div class="week-range" id="week-range"></div>
+        </div>
+        <div id="week-grid" class="week-grid"></div>
+      </section>
+
+      <!-- VIEW: ALL TASKS -->
+      <section id="view-tasks" class="view">
+        <div class="filters-bar">
+          <button class="filter-btn active" onclick="filterTasks('all')">Todas</button>
+          <button class="filter-btn" onclick="filterTasks('pending')">Pendientes</button>
+          <button class="filter-btn" onclick="filterTasks('completed')">Completadas</button>
+        </div>
+        <div class="categories-filter" id="categories-filter"></div>
+        <div id="all-tasks-list" class="tasks-list"></div>
+      </section>
+
+      <!-- VIEW: HABITS -->
+      <section id="view-habits" class="view">
+        <div class="habits-header">
+          <h2>Mis Hábitos</h2>
+          <button class="btn-primary" onclick="showAddHabitModal()">+ Nuevo</button>
+        </div>
+        <div class="habits-streak" id="habits-streak"></div>
+        <div id="habits-list" class="habits-list"></div>
+      </section>
+
+      <!-- VIEW: NOTES -->
+      <section id="view-notes" class="view">
+        <div class="notes-header">
+          <h2>Mis Notas</h2>
+          <button class="btn-primary" onclick="showAddNoteModal()">+ Nueva</button>
+        </div>
+        <div id="notes-grid" class="notes-grid"></div>
+      </section>
+
+      <!-- VIEW: MOOD -->
+      <section id="view-mood" class="view">
+        <div class="mood-header">
+          <h2>¿Cómo te sientes?</h2>
+          <div class="mood-date" id="mood-date"></div>
+        </div>
+        <div class="mood-selector">
+          <button class="mood-btn" data-mood="amazing" onclick="selectMood('amazing')">
+            <span class="mood-emoji">🤩</span>
+            <span class="mood-label">Increíble</span>
+          </button>
+          <button class="mood-btn" data-mood="good" onclick="selectMood('good')">
+            <span class="mood-emoji">😊</span>
+            <span class="mood-label">Bien</span>
+          </button>
+          <button class="mood-btn" data-mood="okay" onclick="selectMood('okay')">
+            <span class="mood-emoji">😐</span>
+            <span class="mood-label">Normal</span>
+          </button>
+          <button class="mood-btn" data-mood="tired" onclick="selectMood('tired')">
+            <span class="mood-emoji">😴</span>
+            <span class="mood-label">Cansada</span>
+          </button>
+          <button class="mood-btn" data-mood="sad" onclick="selectMood('sad')">
+            <span class="mood-emoji">😔</span>
+            <span class="mood-label">Triste</span>
+          </button>
+          <button class="mood-btn" data-mood="stressed" onclick="selectMood('stressed')">
+            <span class="mood-emoji">😰</span>
+            <span class="mood-label">Estresada</span>
+          </button>
+        </div>
+        <div class="mood-note-section">
+          <textarea id="mood-note-text" placeholder="¿Quieres escribir algo sobre tu día? (opcional)"></textarea>
+          <button class="btn-primary full" onclick="saveMood()">Guardar Estado de Ánimo</button>
+        </div>
+        <div class="mood-history" id="mood-history"></div>
+      </section>
+
+      <!-- VIEW: FOCUS -->
+      <section id="view-focus" class="view">
+        <div class="focus-container">
+          <div class="focus-modes">
+            <button class="focus-mode active" onclick="setFocusMode('work')">Trabajo</button>
+            <button class="focus-mode" onclick="setFocusMode('short')">Descanso</button>
+            <button class="focus-mode" onclick="setFocusMode('long')">Largo</button>
+          </div>
+          
+          <div class="timer-display">
+            <div class="timer-circle">
+              <svg viewBox="0 0 200 200">
+                <circle class="timer-bg" cx="100" cy="100" r="90"/>
+                <circle class="timer-progress" id="timer-progress" cx="100" cy="100" r="90"/>
+              </svg>
+              <div class="timer-text">
+                <span id="timer-minutes">25</span>
+                <span class="timer-separator">:</span>
+                <span id="timer-seconds">00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="timer-controls">
+            <button class="timer-btn secondary" onclick="resetTimer()">↺</button>
+            <button class="timer-btn primary" id="timer-toggle" onclick="toggleTimer()">▶</button>
+            <button class="timer-btn secondary" onclick="skipTimer()">⏭</button>
+          </div>
+
+          <div class="focus-stats">
+            <div class="focus-stat">
+              <span class="focus-stat-value" id="focus-sessions">0</span>
+              <span class="focus-stat-label">Sesiones hoy</span>
+            </div>
+            <div class="focus-stat">
+              <span class="focus-stat-value" id="focus-minutes">0</span>
+              <span class="focus-stat-label">Minutos</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Add Task Modal -->
+    <div id="modal-add" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Nueva Tarea</h3>
+          <button class="close-btn" onclick="hideModal('add')">×</button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="task-input" placeholder="¿Qué necesitas hacer?" maxlength="100">
+          <div class="input-row">
+            <select id="task-category">
+              <option value="personal">👤 Personal</option>
+              <option value="work">💼 Trabajo</option>
+              <option value="health">❤️ Salud</option>
+              <option value="home">🏠 Hogar</option>
+              <option value="study">📚 Estudio</option>
+              <option value="social">👥 Social</option>
+            </select>
+            <select id="task-priority">
+              <option value="low">🟢 Baja</option>
+              <option value="medium" selected>🟡 Media</option>
+              <option value="high">🔴 Alta</option>
+            </select>
+          </div>
+          <input type="date" id="task-date">
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="hideModal('add')">Cancelar</button>
+            <button class="btn-primary" onclick="addTask()">Agregar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Note Modal -->
+    <div id="modal-note" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Nueva Nota</h3>
+          <button class="close-btn" onclick="hideModal('note')">×</button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="note-title-input" placeholder="Título de la nota">
+          <textarea id="note-content-input" placeholder="Escribe tu nota aquí..." rows="6"></textarea>
+          <div class="modal-actions">
+            <button class="btn-secondary" onclick="hideModal('note')">Cancelar</button>
+            <button class="btn-primary" onclick="addNote()">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
